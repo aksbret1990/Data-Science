@@ -1,0 +1,97 @@
+store.df=read.csv("http://goo.gl/QPDdMl")
+
+library(car)
+head(store.df)
+tail(store.df)
+some(store.df)
+
+summary(store.df)
+
+## Simple Data Visualization ##
+
+names(store.df)
+hist(store.df$p1sales) #simple histogram (from page 61)
+
+hist(store.df$p1sales, 
+	main="Product 1 Weekly Sales Frequencies, All Store",
+	xlab="Product 1 Sales (Units)",
+	ylab="Count") ## for adding title and axis labels
+
+##################
+### histogram ###
+##################
+
+
+### try some more useful modification techniques if you want ###
+
+hist(store.df$p1sales, 
+	main="Product 1 Weekly Sales Frequencies, All Store",
+	xlab="Product 1 Sales (Units)",
+	ylab="Count",
+	breaks=30, #more columns
+	col="lightblue") #coloring the bars
+
+hist(store.df$p1sales, 
+	main="Product 1 Weekly Sales Frequencies, All Store",
+	xlab="Product 1 Sales (Units)",
+	ylab="Relative frequency",
+	breaks=30, #more columns
+	col="lightblue",
+	freq=FALSE,
+	xaxt="n") #coloring the bars
+
+###############################################
+## add smooth density line to the histogram ###
+###############################################
+
+lines(density(store.df$p1sales, bw=10), 
+	type="l", col="darkred", lwd=2) #lwd=line width
+
+axis(side=2, at=seq(0,1,by=0.1), las=1,
+	labels=paste(seq(0,100,by=10),"%",seq=""))
+abline(h=0.9, lty=3) #add a reference line
+
+
+
+##Cumulative Distribution plot ###
+
+plot(ecdf(store.df$p1sales)) #cdf plot
+
+plot(ecdf(store.df$p1sales), 
+	main="Cumulative distribution of P1 Weekly Sales",
+	ylab="Cumulative Proportion",
+	xlab=c("P1 weekly sales, all stores","90% of weeks sold <= 171 units"),
+	yaxt="n") #cdf plot
+
+
+### mapping Example ####
+
+by(store.df$p1sales, store.df$storeNum, mean)
+
+#aggregated sum values per each country
+p1sales.sum <- aggregate(store.df$p1sales, 
+	by=list(country=store.df$country), sum)
+
+#we need additional packages
+install.packages(c("rworldmap", "RColorBrewer")) #Install two packages
+library(rworldmap) 
+library(RColorBrewer)
+
+#associate the aggregated data with specific map regsions using the country codes.
+p1sales.map<-joinCountryData2Map(p1sales.sum, joinCode ="ISO2",
+	 nameJoinColum = "country")
+
+#Draw a resulting map
+mapCountryData(p1sales.map, nameColumnToPlot="x", 
+	mapTitle="Total P1 sales by Country",
+	colourPalette=brewer.pal(7, "Greens"),
+	catMethod="fixedWidth", addLegend=FALSE)
+
+
+
+
+
+
+
+
+
